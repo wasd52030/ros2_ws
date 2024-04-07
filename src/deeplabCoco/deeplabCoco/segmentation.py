@@ -15,6 +15,8 @@ import tensorflow
 from .dynamicRangeQuantization import dynamicRangeQuantization
 from .float16Quantization import float16Quantization
 from .int8Quantization import int8Quantization
+import matplotlib
+
 
 
 class deeplavCocoSegmentation(Node):
@@ -231,12 +233,19 @@ class deeplavCocoSegmentation(Node):
 
 
 def main(args=None):
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    matplotlib.use("tkAgg")
 
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+    # 初始化ROS
     rclpy.init(args=args)
+    
+    # 創建Node
     node = deeplavCocoSegmentation("deeplabCoco")
+
+    # 讓Node持續運行
     rclpy.spin(node)
-    node.destroy_node()
+    
+    # 關閉ROS
     rclpy.shutdown()
 
 
