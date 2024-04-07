@@ -18,7 +18,6 @@ from .int8Quantization import int8Quantization
 import matplotlib
 
 
-
 class deeplavCocoSegmentation(Node):
     def __init__(
         self,
@@ -52,7 +51,7 @@ class deeplavCocoSegmentation(Node):
         )
 
         self.cvBridge = CvBridge()
-        
+
         pyplot.figure(figsize=(6.4, 6.4))
 
         self.model_dict = {
@@ -61,7 +60,9 @@ class deeplavCocoSegmentation(Node):
             "int8": int8Quantization(),
         }
 
-        self.tensorflowlite_model_type = "fp16"  # @param ['dynamic-range', 'fp16', 'int8']
+        self.tensorflowlite_model_type = (
+            "fp16"  # @param ['dynamic-range', 'fp16', 'int8']
+        )
 
         # Load the model.
         interpreter = tensorflow.lite.Interpreter(
@@ -73,7 +74,10 @@ class deeplavCocoSegmentation(Node):
         interpreter.allocate_tensors()
 
         # Get image size - converting from BHWC to WH
-        self.input_size = self.input_details[0]["shape"][2], self.input_details[0]["shape"][1]
+        self.input_size = (
+            self.input_details[0]["shape"][2],
+            self.input_details[0]["shape"][1],
+        )
 
         pyplot.ion()
 
@@ -93,7 +97,7 @@ class deeplavCocoSegmentation(Node):
 
         return colormap
 
-    def label_to_color_image(self, label):
+    def label_to_color_image(self, label: ArrayLike):
         """Adds color defined by the dataset colormap to the label.
 
         Args:
@@ -224,7 +228,7 @@ class deeplavCocoSegmentation(Node):
 
         self.vis_segmentation(cropped_image, seg_map)
 
-    def listenerCallback(self, data):
+    def listenerCallback(self, data: Image):
         self.get_logger().info(f"{datetime.now()}")
 
         image = self.cvBridge.imgmsg_to_cv2(data, "bgr8")
@@ -234,20 +238,22 @@ class deeplavCocoSegmentation(Node):
 
 def main(args=None):
     matplotlib.use("tkAgg")
-
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
     # 初始化ROS
     rclpy.init(args=args)
-    
+
     # 創建Node
     node = deeplavCocoSegmentation("deeplabCoco")
 
     # 讓Node持續運行
     rclpy.spin(node)
-    
+
     # 關閉ROS
     rclpy.shutdown()
 
 
 if __name__ == "__main__":
     main()
+
+
